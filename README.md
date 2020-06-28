@@ -5,17 +5,20 @@ This module used for SB Advanced Nextbots in Garry's Mod, it will work only for 
 
 #Enums
 
-SBAdvancedNextbotNodeGraph.NODE_ANY
-SBAdvancedNextbotNodeGraph.NODE_DELETED
-SBAdvancedNextbotNodeGraph.NODE_GROUND
-SBAdvancedNextbotNodeGraph.NODE_AIR
-SBAdvancedNextbotNodeGraph.NODE_CLIMB
-SBAdvancedNextbotNodeGraph.NODE_WATER
+	SBAdvancedNextbotNodeGraph.NODE_ANY
+	SBAdvancedNextbotNodeGraph.NODE_DELETED
+	SBAdvancedNextbotNodeGraph.NODE_GROUND
+	SBAdvancedNextbotNodeGraph.NODE_AIR
+	SBAdvancedNextbotNodeGraph.NODE_CLIMB
+	SBAdvancedNextbotNodeGraph.NODE_WATER
 
-SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_UNKNOWN
-SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_SOLO
-SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_UNIVERSAL
-SBAdvancedNextbotNodeGraph.AI_NODE_FIRST_ZONE
+	SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_UNKNOWN
+
+	SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_SOLO
+
+	SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_UNIVERSAL
+
+	SBAdvancedNextbotNodeGraph.AI_NODE_FIRST_ZONE
 
 #Functions
 
