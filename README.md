@@ -13,11 +13,8 @@ This module used for SB Advanced Nextbots in Garry's Mod, it will work only for 
 	SBAdvancedNextbotNodeGraph.NODE_WATER
 
 	SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_UNKNOWN
-
 	SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_SOLO
-
 	SBAdvancedNextbotNodeGraph.AI_NODE_ZONE_UNIVERSAL
-
 	SBAdvancedNextbotNodeGraph.AI_NODE_FIRST_ZONE
 
 #Functions
