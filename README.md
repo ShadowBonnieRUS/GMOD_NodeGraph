@@ -1,5 +1,5 @@
 # Garry's Mod Node graph module
-This module used for SB Advanced Nextbots in Garry's Mod, it will work only for SB Advanced Nextbots. It reads map's .ain file, without that file bots will not be able to move using nodegraph.
+This module used for SB Advanced Nextbots in Garry's Mod, it will work only for SB Advanced Nextbots. It allows bots to move using nodegraph system. It reads map's .ain file, without that file bots will not be able to move using nodegraph.
 
 # Module documentation
 
