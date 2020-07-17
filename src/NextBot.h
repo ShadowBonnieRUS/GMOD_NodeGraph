@@ -8,6 +8,8 @@ class NextBot : public Entity {
 public:
 	float GetStepHeight();
 
+	float GetDeathDropHeight();
+
 	void GetCrouchCollisionBounds(Vector* mins, Vector* maxs);
 
 	int GetSolidMask();

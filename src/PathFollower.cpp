@@ -2,6 +2,7 @@
 #include "CAI_Classes.h"
 #include "PathFollower.h"
 #include "NDebugOverlay.h"
+#include <math.h>
 
 using namespace GarrysMod::Lua;
 
@@ -14,7 +15,7 @@ extern int NodeNum;
 #define MAX_SEGMENTS 128
 
 static bool luagenerator = false;
-static double PathCostGenerator(NodeGraphPathFollower& self, CAI_Node* area, CAI_Node* from,const int cap) {
+static double PathCostGenerator(NodeGraphPathFollower* self, CAI_Node* area, CAI_Node* from,const int cap) {
 	if (luagenerator) {
 		CurLUA->Push(4);
 		CurLUA->PushUserType(area, NodeClass_Type);
@@ -42,10 +43,27 @@ static double PathCostGenerator(NodeGraphPathFollower& self, CAI_Node* area, CAI
 
 	double cost = VecDistance(area->GetOrigin(), from->GetOrigin());
 
-	if (cap & CAP_MOVE_JUMP) {
-		float maxh = self.GetMaxJumpHeight();
+	float z = area->GetOrigin().z - from->GetOrigin().z;
 
-		if (maxh >= 0 && area->GetOrigin().z - from->GetOrigin().z > maxh)
+	if (z < 0 && (cap & (CAP_MOVE_GROUND | CAP_MOVE_JUMP))) {
+		float maxh = self->GetDeathDropHeight();
+		float h = -z;
+
+		if (h > maxh) {
+#define PI 3.14159265f
+
+			float dist = VecDist2D(area->GetOrigin(), from->GetOrigin());
+			float ang = (float)atan(h / dist) / PI * 180.0f;
+
+			if (ang > 60)
+				return -1.0;
+		}
+	}
+
+	if (cap & CAP_MOVE_JUMP) {
+		float maxh = self->GetMaxJumpHeight();
+
+		if (maxh >= 0 && z > maxh)
 			return -1.0;
 
 		return cost * 5.0;
@@ -81,6 +99,7 @@ NodeGraphPathFollower::~NodeGraphPathFollower() {
 bool NodeGraphPathFollower::Compute(NextBot* bot,const Vector& to) {
 	Start = bot->GetPos();
 	Goal = to;
+	SetDeathDropHeight(bot->GetDeathDropHeight());
 
 	Valid = false;
 
@@ -97,7 +116,7 @@ bool NodeGraphPathFollower::BuildPath(NextBot* bot) {
 	bot->GetCrouchCollisionBounds(&mins, &maxs);
 	mins.z += step;
 
-	TraceFilter filter = TraceFilter(bot);
+	TraceFilter_table filter(bot);
 
 	if (TrivialPathCheck(Start, Goal, mask, mins, maxs, step, filter)) {
 		ConstructTrivial(Start, Goal, GetNearestNode(Start));
@@ -265,7 +284,7 @@ bool NodeGraphPathFollower::Astar(const Vector& start,const Vector& goal,const i
 
 	SearchList.AddToOpenList(from->GetID());
 	SearchList.SetCostSoFar(from->GetID(), 0);
-	SearchList.SetTotalCost(from->GetID(), PathCostGenerator(*this, from, nullptr, cap));
+	SearchList.SetTotalCost(from->GetID(), PathCostGenerator(this, from, nullptr, cap));
 
 	while (!SearchList.IsOpenListEmpty()) {
 		int curid = SearchList.PopOpenList();
@@ -286,7 +305,7 @@ bool NodeGraphPathFollower::Astar(const Vector& start,const Vector& goal,const i
 			CAI_Node* neighbor = link->DestNode();
 			int nid = neighbor->GetID();
 
-			double dist = PathCostGenerator(*this, neighbor, cur, curcap);
+			double dist = PathCostGenerator(this, neighbor, cur, curcap);
 			if (dist < 0)
 				continue;
 
@@ -294,7 +313,7 @@ bool NodeGraphPathFollower::Astar(const Vector& start,const Vector& goal,const i
 
 			if (!SearchList.IsClosed(nid) || newcost < SearchList.GetCostSoFar(nid)) {
 				SearchList.SetCostSoFar(nid,newcost);
-				SearchList.SetTotalCost(nid, newcost + PathCostGenerator(*this, neighbor, to, curcap));
+				SearchList.SetTotalCost(nid, newcost + PathCostGenerator(this, neighbor, to, curcap));
 
 				if (SearchList.IsClosed(nid)) {
 					SearchList.RemoveFromClosedList(nid);
@@ -423,7 +442,15 @@ Vector NodeGraphPathFollower::Avoid(NextBot* bot, const Vector& goalpos, const V
 	AvoidHullMin = vector(-size, -size, step);
 	AvoidHullMax = vector(size, size, bmax.z);
 
-	TraceFilter filter(bot);
+	TraceFilter_table filter(bot);
+	
+	Entity* filterents[1024];
+	int count = bot->GetChildren(filterents, 1024);
+
+	for (int i = 0; i < count; i++) {
+		filter + filterents[i];
+	}
+
 	TraceResult result;
 	Entity* door = nullptr;
 
@@ -584,6 +611,14 @@ void NodeGraphPathFollower::SetMaxJumpHeight(const float height) {
 
 float NodeGraphPathFollower::GetMaxJumpHeight() {
 	return MaxJumpHeight;
+}
+
+void NodeGraphPathFollower::SetDeathDropHeight(const float height) {
+	DeathDropHeight = height;
+}
+
+float NodeGraphPathFollower::GetDeathDropHeight() {
+	return DeathDropHeight;
 }
 
 PathSearchList::PathSearchList() {

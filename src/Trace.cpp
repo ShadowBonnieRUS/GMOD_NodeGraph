@@ -1,21 +1,27 @@
 #include "Trace.h"
 
-TraceFilter::TraceFilter(Entity* ent) {
-	ents = new Entity * [1024]{ ent };
+TraceFilter_table::TraceFilter_table(Entity* ent) {
+	ents = new Entity*[1024]{ent};
 	entcount = 1;
 }
 
-TraceFilter::~TraceFilter() {
+TraceFilter_table::~TraceFilter_table() {
 	delete[] ents;
 }
 
-TraceFilter& TraceFilter::operator+(Entity* ent) {
+TraceFilter_table& TraceFilter_table::operator+(Entity* ent) {
 	ents[entcount++] = ent;
 
 	return *this;
 }
 
-void TraceFilter::PushFilter() {
+TraceFilter_table& TraceFilter_table::operator+=(Entity* ent) {
+	ents[entcount++] = ent;
+
+	return *this;
+}
+
+void TraceFilter_table::PushFilter() {
 	CurLUA->CreateTable();
 
 	for (int i = 0; i < entcount; i++) {
@@ -23,6 +29,16 @@ void TraceFilter::PushFilter() {
 		CurLUA->PushUserType(ents[i], Type::Entity);
 		CurLUA->SetTable(-3);
 	}
+}
+
+TraceFilter_function::TraceFilter_function(CFunc func) {
+	PushFunc = func;
+}
+
+TraceFilter_function::~TraceFilter_function() {}
+
+void TraceFilter_function::PushFilter() {
+	CurLUA->PushCFunction(PushFunc);
 }
 
 void TraceHull(const Vector& start, const Vector& endpos, const Vector& min, const Vector& max, const int mask, TraceFilter& filter, TraceResult& result) {

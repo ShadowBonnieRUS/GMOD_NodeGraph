@@ -27,6 +27,7 @@ class NodeGraphPathFollower {
 	Vector Goal;
 	Vector Start;
 	float MaxJumpHeight = -1.0f;
+	float DeathDropHeight = -1.0f;
 
 	float AvoidTimer = 0;
 	bool AvoidCheck = false;
@@ -96,6 +97,10 @@ public:
 	void SetMaxJumpHeight(const float height);
 
 	float GetMaxJumpHeight();
+
+	void SetDeathDropHeight(const float height);
+
+	float GetDeathDropHeight();
 
 	static void CreateLuaFunctions();
 

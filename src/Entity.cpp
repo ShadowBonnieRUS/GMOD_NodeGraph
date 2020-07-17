@@ -13,6 +13,34 @@ bool Entity::IsValid() {
 	return isvalid;
 }
 
+int Entity::GetChildren(Entity** childrens, const int size) {
+	CurLUA->PushUserType(this, Type::Entity);
+	CurLUA->GetField(-1, "GetChildren");
+	CurLUA->Push(-2);
+	CurLUA->Call(1, 1);
+
+	int count = 0;
+	while (true) {
+		CurLUA->PushNumber(count + 1);
+		CurLUA->GetTable(-2);
+
+		if (!CurLUA->IsType(-1,Type::Entity)) {
+			CurLUA->Pop();
+			break;
+		}
+
+		childrens[count++] = CurLUA->GetUserType<Entity>(-1, Type::Entity);
+		CurLUA->Pop();
+
+		if (count >= size)
+			break;
+	}
+
+	CurLUA->Pop(2);
+
+	return count;
+}
+
 const char* Entity::GetClass() {
 	CurLUA->PushUserType(this, Type::Entity);
 	CurLUA->GetField(-1, "GetClass");
@@ -93,4 +121,26 @@ float Entity::GetModelScale() {
 	CurLUA->Pop(2);
 
 	return scale;
+}
+
+bool Entity::operator==(Entity& ent) {
+	CurLUA->PushUserType(this, Type::Entity);
+	CurLUA->GetField(-1, "EntIndex");
+	CurLUA->Push(-2);
+	CurLUA->Call(1, 1);
+
+	int index_this = (int)CurLUA->GetNumber(-1);
+
+	CurLUA->Pop(2);
+
+	CurLUA->PushUserType(&ent, Type::Entity);
+	CurLUA->GetField(-1, "EntIndex");
+	CurLUA->Push(-2);
+	CurLUA->Call(1, 1);
+
+	int index_ent = (int)CurLUA->GetNumber(-1);
+
+	CurLUA->Pop(2);
+
+	return index_this == index_ent;
 }

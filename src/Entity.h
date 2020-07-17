@@ -7,6 +7,8 @@ class Entity {
 public:
 	bool IsValid();
 
+	int GetChildren(Entity** childrens, const int size);
+
 	const char* GetClass();
 
 	bool IsClass(const char* Class);
@@ -18,6 +20,8 @@ public:
 	QAngle GetAngles();
 
 	float GetModelScale();
+
+	bool operator==(Entity& ent);
 };
 
 #endif

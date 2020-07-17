@@ -11,13 +11,28 @@ struct TraceResult {
 };
 
 class TraceFilter {
-	Entity** ents;
-	int entcount = 0;
 public:
-	TraceFilter(Entity* ent);
-	~TraceFilter();
+	virtual void PushFilter() = 0;
+};
 
-	TraceFilter& operator+(Entity* ent);
+class TraceFilter_table : public TraceFilter {
+	Entity** ents;
+	int entcount;
+public:
+	TraceFilter_table(Entity* ent);
+	~TraceFilter_table();
+
+	TraceFilter_table& operator+(Entity* ent);
+	TraceFilter_table& operator+=(Entity* ent);
+
+	void PushFilter();
+};
+
+class TraceFilter_function : public TraceFilter {
+	CFunc PushFunc;
+public:
+	TraceFilter_function(CFunc func);
+	~TraceFilter_function();
 
 	void PushFilter();
 };

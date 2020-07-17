@@ -14,6 +14,20 @@ float NextBot::GetStepHeight() {
 	return step;
 }
 
+float NextBot::GetDeathDropHeight() {
+	CurLUA->PushUserType(this, Type::Entity);
+	CurLUA->GetField(-1, "loco");
+	CurLUA->GetField(-1, "GetDeathDropHeight");
+	CurLUA->Push(-2);
+	CurLUA->Call(1, 1);
+
+	float height = (float)CurLUA->GetNumber(-1);
+
+	CurLUA->Pop(3);
+
+	return height;
+}
+
 void NextBot::GetCrouchCollisionBounds(Vector* mins, Vector* maxs) {
 	CurLUA->PushUserType(this, Type::Entity);
 	CurLUA->GetField(-1,"CrouchCollisionBounds");
